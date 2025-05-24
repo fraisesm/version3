@@ -1,21 +1,21 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-from .database import Base
+
+Base = declarative_base()
 
 class Team(Base):
     __tablename__ = "teams"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), unique=True, index=True)
-    token = Column(String(255))
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, index=True)
+    token = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_seen = Column(DateTime, default=datetime.utcnow)
 
 class Task(Base):
     __tablename__ = "tasks"
-
-    id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String(50))
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
     content = Column(Text)
     answer = Column(Text)
     is_sent = Column(Boolean, default=False)
@@ -23,11 +23,10 @@ class Task(Base):
 
 class Submission(Base):
     __tablename__ = "submissions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    team_id = Column(Integer)
-    task_id = Column(Integer)
+    id = Column(Integer, primary_key=True)
+    team_id = Column(Integer, ForeignKey("teams.id"))
+    task_id = Column(Integer, ForeignKey("tasks.id"))
     content = Column(Text)
-    status = Column(String(20), default="pending")
-    received_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(String, default="submitted")
+    created_at = Column(DateTime, default=datetime.utcnow)
     processing_time = Column(Integer)
